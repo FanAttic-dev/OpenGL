@@ -152,7 +152,7 @@ int main() {
 		//trans = glm::scale(trans, glm::vec3(0.5f));
 		float time = (float)glfwGetTime();
 		glm::mat4 trans(1.f);
-		trans = glm::rotate(trans, time+1, glm::vec3(0.f, 0.f, 1.f));
+		trans = glm::rotate(trans, time, glm::vec3(0.f, 0.f, 1.f));
 		glUniformMatrix4fv(glGetUniformLocation(program.ID, "trans"), 1, GL_FALSE, glm::value_ptr(trans));
 
 		glActiveTexture(GL_TEXTURE0);
