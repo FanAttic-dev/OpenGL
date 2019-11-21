@@ -236,7 +236,7 @@ void processInput(GLFWwindow *window)
 		glfwSetWindowShouldClose(window, true);
 
 	// hold UP/DOWN for moving the camera on the z axis
-	float moving_const = 0.01f;
+	float moving_const = 0.01f; 
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		camera_model.z -= moving_const;
 	}
