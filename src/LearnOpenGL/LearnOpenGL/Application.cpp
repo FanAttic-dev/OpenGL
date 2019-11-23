@@ -7,17 +7,27 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Shader.h"
+#include "Camera.h"
 
 #include <iostream>
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 
+// screen
 const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1440;
 
-glm::vec3 camera_model = glm::vec3(0.f, 0.f, -5.f);
-float fov = 45.f;
+// camera
+Camera camera(glm::vec3(0.f, 0.f, 5.f));
+bool firstMouse = true;
+float xLast, yLast;
+
+// timing
+float deltaTime = 0.f;
+float lastFrame = 0.f;
 
 int main() {
 
@@ -39,6 +49,10 @@ int main() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	// Mouse
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetScrollCallback(window, scroll_callback);
 
 	// glad: load all OpenGL function pointers
 	// ------------------------------------------------------------------
@@ -47,11 +61,14 @@ int main() {
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-
-	// build and compile our shader program
-	Shader program("Shaders/vertex.vs", "Shaders/fragment.fs");
-
+	
+	// configure global opengl state
+	// -----------------------------
 	glEnable(GL_DEPTH_TEST);
+	
+	// build and compile our shader program
+	// ------------------------------------
+	Shader program("Shaders/vertex.vs", "Shaders/fragment.fs");
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
@@ -98,6 +115,17 @@ int main() {
 	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
 	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 	};
+	glm::vec3 cubePositions[] = {
+		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(0.0f,  5.0f,  -1.0f),
+		glm::vec3(-5.f, -0.1f, -2.f),
+		glm::vec3(5.f, -0.1f, -2.f),
+		glm::vec3(0.f, -5.f, -1.f),
+		glm::vec3(1.f, 0.f, -3.f),
+		glm::vec3(-1.f, 0.f, -3.f),
+		glm::vec3(0.f, 1.f, -3.f),
+		glm::vec3(0.f, -1.f, -3.f)
+	};
 
 	unsigned int VAO, VBO;
 	glGenVertexArrays(1, &VAO);
@@ -108,9 +136,11 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
+	// texture coordinates attribute
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
@@ -136,7 +166,6 @@ int main() {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 	stbi_image_free(data);
-
 
 	unsigned int texture2;
 	glGenTextures(1, &texture2);
@@ -164,24 +193,22 @@ int main() {
 	program.setInt("box_texture", 0);
 	program.setInt("face_texture", 1);
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(0.0f,  5.0f,  -1.0f),
-		glm::vec3(-5.f, -0.1f, -2.f),
-		glm::vec3(5.f, -0.1f, -2.f),
-		glm::vec3(0.f, -5.f, -1.f),
-		glm::vec3(1.f, 0.f, -3.f),
-		glm::vec3(-1.f, 0.f, -3.f),
-		glm::vec3(0.f, 1.f, -3.f),
-		glm::vec3(0.f, -1.f, -3.f)
-	};
-
 	// render loop
 	// ------------------------------------------------------------------
 	while (!glfwWindowShouldClose(window))
 	{
+		// per-frame time logic
+		// --------------------
+		float currentFrame = float(glfwGetTime());
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+		
+		// input
+		// -----
 		processInput(window);
 
+		// render
+        // ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -191,30 +218,26 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture2);
 
 		program.use();
-
-		glm::mat4 model(1.f);
-		glm::mat4 view(1.f);
-		glm::mat4 projection(1.f);
-		float time = float(glfwGetTime());
-
-		projection = glm::perspective(glm::radians(fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
 		
-		view = glm::translate(view, camera_model);
-		program.setMat4("view", view);
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
 		program.setMat4("projection", projection);
 		
+		glm::mat4 view = camera.GetViewMatrix();
+		program.setMat4("view", view);
+		
+		// render boxes
+		glm::mat4 model(1.f);
 		glBindVertexArray(VAO);
-
 		for (glm::vec3 cube : cubePositions) {
 			model = glm::translate(glm::mat4(1.f), cube);
-			model = glm::rotate(model, time, glm::vec3(0.5f, 1.f, 0.f));
+			model = glm::rotate(model, currentFrame, glm::vec3(0.5f, 1.f, 0.f));
 
 			program.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		glBindVertexArray(0);
-
+		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+		// -------------------------------------------------------------------------------
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -223,7 +246,6 @@ int main() {
 	// ------------------------------------------------------------------
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-
 	glfwTerminate();
 	return 0;
 }
@@ -231,27 +253,39 @@ int main() {
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow *window)
-{
+{	
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	// hold UP/DOWN for moving the camera on the z axis
-	float moving_const = 0.01f;
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		camera_model.z -= moving_const;
-	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		camera_model.z += moving_const;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camera.ProcessKeyboard(FORWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camera.ProcessKeyboard(BACKWARD, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camera.ProcessKeyboard(LEFT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos) 
+{
+	if (firstMouse) {
+		xLast = xpos;
+		yLast = ypos;
+		firstMouse = false;
 	}
 
-	// hold LEFT/RIGHT for changing the FOV
-	float fov_df = 0.1f;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		fov -= fov_df;
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		fov += fov_df;
-	}
+	float xOffset = xpos - xLast;
+	float yOffset = yLast - ypos; // reversed since y-coordinates go from bottom to top
+	xLast = xpos;
+	yLast = ypos;
+
+	camera.ProcessMouseMovement(xOffset, yOffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	camera.ProcessMouseScroll(yoffset);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

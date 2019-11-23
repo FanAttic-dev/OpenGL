@@ -140,6 +140,10 @@
     <Image Include="..\..\..\resources\textures\awesomeface.png" />
     <Image Include="..\..\..\resources\textures\container.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\includes\Camera.h" />
+    <ClInclude Include="..\..\..\includes\Shader.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
