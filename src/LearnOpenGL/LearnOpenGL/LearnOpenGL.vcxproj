@@ -134,6 +134,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\fragment.fs" />
+    <None Include="Shaders\lamp.fs" />
+    <None Include="Shaders\lamp.vs" />
     <None Include="Shaders\vertex.vs" />
   </ItemGroup>
   <ItemGroup>

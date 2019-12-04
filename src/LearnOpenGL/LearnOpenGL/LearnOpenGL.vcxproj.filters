@@ -38,6 +38,12 @@
     <None Include="Shaders\vertex.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\lamp.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\lamp.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png">
