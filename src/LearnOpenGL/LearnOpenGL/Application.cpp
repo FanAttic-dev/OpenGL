@@ -121,7 +121,7 @@ int main() {
 	};
 
 	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
+		glm::vec3(0.0f,  0.0f,  0.0f)/*,
 		glm::vec3(0.0f,  5.0f,  -1.0f),
 		glm::vec3(-5.f, -0.1f, -2.f),
 		glm::vec3(5.f, -0.1f, -2.f),
@@ -129,7 +129,7 @@ int main() {
 		glm::vec3(1.f, 0.f, -3.f),
 		glm::vec3(-1.f, 0.f, -3.f),
 		glm::vec3(0.f, 1.f, -3.f),
-		glm::vec3(0.f, -1.f, -3.f)
+		glm::vec3(0.f, -1.f, -3.f)*/
 	};
 
 	unsigned int VAO, VBO;
@@ -186,7 +186,7 @@ int main() {
 		program.setVec3("objectColor", glm::vec3(1.f, .5f, 0.31f));
 		program.setVec3("lightColor", glm::vec3(1.f));
 		
-		lightPos = glm::vec3(cos(currentFrame) * 2.f, .5f, sin(currentFrame) * 2.f);
+		//lightPos = glm::vec3(cos(currentFrame) * 2.f, .5f, sin(currentFrame) * 2.f);
 		program.setVec3("lightPos", lightPos);
 		program.setVec3("eyePos", camera.Position);
 
@@ -197,10 +197,9 @@ int main() {
 		glm::mat4 model(1.f);
 		glBindVertexArray(VAO);
 		
-		glDrawArrays(GL_TRIANGLES, 0, 36);
 		for (glm::vec3 cube : cubePositions) {
 			model = glm::translate(glm::mat4(1.f), cube);
-			model = glm::rotate(model, currentFrame, glm::vec3(0.5f, 1.f, 0.f));
+			//model = glm::rotate(model, currentFrame, glm::vec3(0.5f, 1.f, 0.f));
 
 			program.setMat4("model", model);
 
