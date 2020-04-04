@@ -24,7 +24,7 @@ void main()
     vec3 diffuse = diff * lightColor;
 
 	// specular
-	float specularStrength = 0.50;
+	float specularStrength = 0.5;
 	float shininess = 64;
 	vec3 viewDir = normalize(eyePos - FragPos);
 	vec3 reflected = reflect(-lightDir, norm);
