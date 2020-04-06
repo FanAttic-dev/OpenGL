@@ -183,24 +183,36 @@ int main() {
 
 		// cubes
 		program.use();
-		program.setVec3("objectColor", glm::vec3(1.f, .5f, 0.31f));
-		program.setVec3("lightColor", glm::vec3(1.f));
+		program.setVec3("material.diffuse", glm::vec3(0.75164,	0.60648,	0.22648));
+		program.setVec3("material.ambient", glm::vec3(0.24725,	0.1995,	0.0745));
+		program.setVec3("material.specular", glm::vec3(0.628281	,0.555802,	0.366065));
+		program.setFloat("material.shininess", 8.f);
 		
 		//lightPos = glm::vec3(cos(currentFrame) * 2.f, .5f, sin(currentFrame) * 2.f);
-		program.setVec3("lightPos", lightPos);
+		program.setVec3("light.position", lightPos);
+
+		glm::vec3 lightColor;
+		lightColor.x = sin(currentFrame * 0.5f);
+		lightColor.y = sin(currentFrame);
+		lightColor.z = sin(currentFrame * 2.f);
+		
+		program.setVec3("light.ambient", lightColor * 0.2f);
+		program.setVec3("light.diffuse", lightColor * 0.6f);
+		program.setVec3("light.specular", glm::vec3(1.f));
+		
 		program.setVec3("eyePos", camera.Position);
 
 		program.setMat4("projection", projection);
 		program.setMat4("view", view);
 
-			// render boxes
+		// render boxes
 		glm::mat4 model(1.f);
 		glBindVertexArray(VAO);
 		
-		for (glm::vec3 cube : cubePositions) {
+		for (const glm::vec3 cube : cubePositions) {
 			model = glm::translate(glm::mat4(1.f), cube);
 			//model = glm::rotate(model, currentFrame, glm::vec3(0.5f, 1.f, 0.f));
-
+			
 			program.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -211,10 +223,10 @@ int main() {
 		lamp.setMat4("projection", projection);
 		lamp.setMat4("view", view);
 
-		glm::mat4 lampModel(1.f);
-		lampModel = glm::translate(lampModel, lightPos);
-		lampModel = glm::scale(lampModel, glm::vec3(.2f));
-		lamp.setMat4("model", lampModel);
+		glm::mat4 lamp_model(1.f);
+		lamp_model = glm::translate(lamp_model, lightPos);
+		lamp_model = glm::scale(lamp_model, glm::vec3(.2f));
+		lamp.setMat4("model", lamp_model);
 		
 		glBindVertexArray(lightVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -229,6 +241,7 @@ int main() {
 	// glfw: terminate, clearing all previously allocated GLFW resources.
 	// ------------------------------------------------------------------
 	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &lightVAO);
 	glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 	return 0;
@@ -255,7 +268,7 @@ void processInput(GLFWwindow *window)
 		camera.ProcessKeyboard(DOWN, deltaTime);
 }
 
-void mouse_callback(GLFWwindow* window, double xpos, double ypos) 
+void mouse_callback(GLFWwindow* window, const double xpos, const double ypos) 
 {
 	if (firstMouse) {
 		xLast = float(xpos);
@@ -263,8 +276,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 		firstMouse = false;
 	}
 
-	float xOffset = float(xpos) - xLast;
-	float yOffset = yLast - float(ypos); // reversed since y-coordinates go from bottom to top
+	const float xOffset = float(xpos) - xLast;
+	const float yOffset = yLast - float(ypos); // reversed since y-coordinates go from bottom to top
 	xLast = float(xpos);
 	yLast = float(ypos);
 
