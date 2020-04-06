@@ -25,6 +25,7 @@ in vec2 TexCoords;
 out vec4 FragColor;
 
 uniform vec3 eyePos;
+uniform float time;
 
 void main() 
 {	
@@ -45,7 +46,7 @@ void main()
 
 	vec3 emission = vec3(0.0, 0.0, 0.0);
 	if (texture(material.specular, TexCoords).rgb == vec3(0.0, 0.0, 0.0)) {
-		emission = texture(material.emission, TexCoords).rgb * 0.2;
+		emission = texture(material.emission, TexCoords).rgb * sin(time * 3);
 	}
 
 

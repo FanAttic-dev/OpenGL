@@ -200,6 +200,7 @@ int main() {
 		//lightPos = glm::vec3(cos(currentFrame) * 2.f, .5f, sin(currentFrame) * 2.f);
 		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("eyePos", camera.Position);
+		lightingShader.setFloat("time", currentFrame);
 
 		// light properties
 		glm::vec3 lightColor(1.f);
