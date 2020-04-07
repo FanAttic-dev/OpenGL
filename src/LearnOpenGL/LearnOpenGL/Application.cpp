@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb_image.h>
+#include <assimp/Importer.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -34,6 +35,7 @@ float lastFrame = 0.f;
 glm::vec3 lightPos(1.f);
 
 int main() {
+	Assimp::Importer importer;
 
 	// glfw: init and configure
 	// ------------------------------------------------------------------
