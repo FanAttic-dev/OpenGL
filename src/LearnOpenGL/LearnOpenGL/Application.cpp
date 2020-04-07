@@ -7,8 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.h"
-#include "camera.h"
+#include <learnopengl/shader.h>
+#include <learnopengl/camera.h>
+#include <learnopengl/mesh.h>
 
 #include <iostream>
 
@@ -35,8 +36,6 @@ float lastFrame = 0.f;
 glm::vec3 lightPos(1.f);
 
 int main() {
-	Assimp::Importer importer;
-
 	// glfw: init and configure
 	// ------------------------------------------------------------------
 	glfwInit();
@@ -137,6 +136,7 @@ int main() {
 		glm::vec3(1.5f,  0.2f, -1.5f),
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
+	
 	// positions of the point lights
 	glm::vec3 pointLightPositions[] = {
 		glm::vec3(0.7f,  0.2f,  2.0f),

@@ -145,8 +145,9 @@
     <Image Include="..\..\..\resources\textures\container.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\includes\camera.h" />
-    <ClInclude Include="..\..\..\includes\shader.h" />
+    <ClInclude Include="..\..\..\includes\learnopengl\camera.h" />
+    <ClInclude Include="..\..\..\includes\learnopengl\mesh.h" />
+    <ClInclude Include="..\..\..\includes\learnopengl\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -54,10 +54,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\includes\camera.h">
+    <ClInclude Include="..\..\..\includes\learnopengl\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\includes\shader.h">
+    <ClInclude Include="..\..\..\includes\learnopengl\mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\includes\learnopengl\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
