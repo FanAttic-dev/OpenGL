@@ -135,10 +135,12 @@
     <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\lighting_maps.fs" />
+    <None Include="Shaders\lighting.fs" />
     <None Include="Shaders\lamp.fs" />
     <None Include="Shaders\lamp.vs" />
-    <None Include="Shaders\lighting_maps.vs" />
+    <None Include="Shaders\lighting.vs" />
+    <None Include="Shaders\model.fs" />
+    <None Include="Shaders\model.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png" />
@@ -147,6 +149,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\includes\learnopengl\camera.h" />
     <ClInclude Include="..\..\..\includes\learnopengl\mesh.h" />
+    <ClInclude Include="..\..\..\includes\learnopengl\model.h" />
     <ClInclude Include="..\..\..\includes\learnopengl\shader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

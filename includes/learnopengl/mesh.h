@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include <learnopengl/shader.h>
 
@@ -36,7 +35,7 @@ private:
 	void setupMesh();
 };
 
-inline Mesh::Mesh(vector<Vertex> vertices, vector<unsigned> indices, vector<Texture> textures)
+inline Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
 	: vertices(vertices), indices(indices), textures(textures)
 {
 	setupMesh();

@@ -38,10 +38,16 @@
     <None Include="Shaders\lamp.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\lighting_maps.fs">
+    <None Include="Shaders\lighting.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\lighting_maps.vs">
+    <None Include="Shaders\lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\model.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\model.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -61,6 +67,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\includes\learnopengl\shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\includes\learnopengl\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
