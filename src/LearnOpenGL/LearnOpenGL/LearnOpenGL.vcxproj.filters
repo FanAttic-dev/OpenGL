@@ -56,6 +56,12 @@
     <None Include="Shaders\no_texture.fs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\screen_quad.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\screen_quad.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png">

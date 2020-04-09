@@ -143,6 +143,8 @@
     <None Include="Shaders\model.vs" />
     <None Include="Shaders\no_lighting.fs" />
     <None Include="Shaders\no_lighting.vs" />
+    <None Include="Shaders\screen_quad.fs" />
+    <None Include="Shaders\screen_quad.vs" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png" />
