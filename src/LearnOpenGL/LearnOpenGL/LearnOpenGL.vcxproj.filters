@@ -50,6 +50,12 @@
     <None Include="Shaders\model.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\no_lighting.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\no_lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png">
