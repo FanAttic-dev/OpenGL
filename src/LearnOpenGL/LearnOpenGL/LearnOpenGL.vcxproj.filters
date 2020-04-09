@@ -32,12 +32,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\lamp.fs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\lamp.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\lighting.fs">
       <Filter>Shaders</Filter>
     </None>
@@ -54,6 +48,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\no_lighting.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\no_texture.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\no_texture.fs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

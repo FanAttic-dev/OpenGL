@@ -136,8 +136,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\lighting.fs" />
-    <None Include="Shaders\lamp.fs" />
-    <None Include="Shaders\lamp.vs" />
+    <None Include="Shaders\no_texture.fs" />
+    <None Include="Shaders\no_texture.vs" />
     <None Include="Shaders\lighting.vs" />
     <None Include="Shaders\model.fs" />
     <None Include="Shaders\model.vs" />
