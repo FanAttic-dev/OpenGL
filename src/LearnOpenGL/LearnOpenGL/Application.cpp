@@ -17,6 +17,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path);
+bool keyWasPressed = false;
 
 // screen
 const unsigned int SCR_WIDTH = 1920;
@@ -294,6 +295,27 @@ void processInput(GLFWwindow *window)
 		camera.ProcessKeyboard(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		camera.ProcessKeyboard(DOWN, deltaTime);
+
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+		keyWasPressed = true;
+
+	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_RELEASE)
+	{
+		if (keyWasPressed == true)
+		{
+			GLint polygonMode[2];
+			glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+
+			if (polygonMode[1] == GL_LINE)
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			
+			keyWasPressed = false;
+		}
+		
+	}	
 }
 
 void mouse_callback(GLFWwindow* window, const double xpos, const double ypos) 
