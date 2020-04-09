@@ -135,8 +135,6 @@
     <ClCompile Include="Application.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\highlight.fs" />
-    <None Include="Shaders\highlight.vs" />
     <None Include="Shaders\lighting.fs" />
     <None Include="Shaders\no_texture.fs" />
     <None Include="Shaders\no_texture.vs" />

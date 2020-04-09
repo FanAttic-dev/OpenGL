@@ -56,12 +56,6 @@
     <None Include="Shaders\no_texture.fs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\highlight.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\highlight.fs">
-      <Filter>Shaders</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png">

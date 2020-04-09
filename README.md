@@ -30,7 +30,7 @@
 
 - depth testing -> fragment shader -> stencil testing
 
-- ```c++
+  ```c++
   // turn on stencil test
   glEnable(GL_STENCIL_TEST);
   glClear(GL_STENCIL_BUFFER_BIT); 
@@ -64,7 +64,7 @@
 
   3. disable depth test and writing to the stencil buffer and render the highlight color using a simple shader only where **the stencil values are not equal to 1**
 
-     ```
+     ```c++
      glDisable(GL_DEPTH_TEST);
      glStencilMask(0x00);
      glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -75,3 +75,4 @@
      ```
 
      
+

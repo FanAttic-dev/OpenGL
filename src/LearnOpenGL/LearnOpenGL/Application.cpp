@@ -75,7 +75,6 @@ int main() {
 	// ------------------------------------
 	Shader noLightShader("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	Shader noTextureShader("Shaders/no_texture.vs", "Shaders/no_texture.fs");
-	Shader highlightShader("Shaders/highlight.vs", "Shaders/highlight.fs");
 	
 	// load models
 	// ------------------------------------
@@ -146,13 +145,13 @@ int main() {
 	// Plane
 	float planeVertices[] = {
 		// positions          // texture Coords (note we set these higher than 1 (together with GL_REPEAT as texture wrapping mode). this will cause the floor texture to repeat)
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
+		 5.0f, -0.5f,  5.0f,  8.0f, 0.0f,
 		-5.0f, -0.5f,  5.0f,  0.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
+		-5.0f, -0.5f, -5.0f,  0.0f, 8.0f,
 
-		 5.0f, -0.5f,  5.0f,  2.0f, 0.0f,
-		-5.0f, -0.5f, -5.0f,  0.0f, 2.0f,
-		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
+		 5.0f, -0.5f,  5.0f,  8.0f, 0.0f,
+		-5.0f, -0.5f, -5.0f,  0.0f, 8.0f,
+		 5.0f, -0.5f, -5.0f,  8.0f, 8.0f
 	};
 
 	unsigned int planeVAO, planeVBO;
@@ -165,13 +164,16 @@ int main() {
 	
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	//glEnableVertexAttribArray(2);
-	//glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	glBindVertexArray(0);
 
 	// textures
-	unsigned int containerTexture = TextureFromFile("container.jpg", "../../../resources/textures");
+	string texturesDirectory = "../../../resources/textures";
+	unsigned int containerTexture = TextureFromFile("container.jpg", texturesDirectory);
+	unsigned int marbleTexture = TextureFromFile("marble.png", texturesDirectory);
+
 	noLightShader.use();
 	noLightShader.setInt("texture0", 0);
 	
@@ -202,12 +204,15 @@ int main() {
 
 		// FLOOR
 		glStencilMask(0x00); // make sure we don't update the stencil buffer while drawing the floor
-		noTextureShader.use();
+		noLightShader.use();
 
-		noTextureShader.setMat4("projection", projection);
-		noTextureShader.setMat4("view", view);
+		noLightShader.setMat4("projection", projection);
+		noLightShader.setMat4("view", view);
 		glm::mat4 floorModel = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.05f, 0));
-		noTextureShader.setMat4("model", floorModel);
+		noLightShader.setMat4("model", floorModel);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, marbleTexture);
 
 		glBindVertexArray(planeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -217,7 +222,7 @@ int main() {
 		glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
 		glStencilMask(0xFF); // enable writing to the stencil buffer
 
-		// CUBE
+		// CUBE		
 		noLightShader.use();
 
 		noLightShader.setMat4("projection", projection);
@@ -227,20 +232,22 @@ int main() {
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, containerTexture);
-
+		
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// draw outline
 		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 		glStencilMask(0x00); // disable writing to the stencil buffer
-		highlightShader.use();
+		noTextureShader.use();
 		
-		highlightShader.setMat4("projection", projection);
-		highlightShader.setMat4("view", view);
+		noTextureShader.setMat4("projection", projection);
+		noTextureShader.setMat4("view", view);
 		cubeModel = glm::scale(cubeModel, glm::vec3(1.05f));
-		highlightShader.setMat4("model", cubeModel);
+		noTextureShader.setMat4("model", cubeModel);
 
+		noTextureShader.setVec3("color", glm::vec3(240 / 255.0f, 56 / 255.0f, 107 / 255.0f));
+		
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
