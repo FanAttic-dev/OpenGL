@@ -75,6 +75,7 @@ int main() {
 	// ------------------------------------
 	Shader noLightShader("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	Shader noTextureShader("Shaders/no_texture.vs", "Shaders/no_texture.fs");
+	Shader highlightShader("Shaders/highlight.vs", "Shaders/highlight.fs");
 	
 	// load models
 	// ------------------------------------
@@ -191,42 +192,67 @@ int main() {
 
 		// render
         // ------
+        glEnable(GL_DEPTH_TEST);
+		glEnable(GL_STENCIL_TEST);
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-		noLightShader.use();
-		
-		// view/projection transformations
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
 		glm::mat4 view = camera.GetViewMatrix();
+
+		// FLOOR
+		glStencilMask(0x00); // make sure we don't update the stencil buffer while drawing the floor
+		noTextureShader.use();
+
+		noTextureShader.setMat4("projection", projection);
+		noTextureShader.setMat4("view", view);
+		glm::mat4 floorModel = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.05f, 0));
+		noTextureShader.setMat4("model", floorModel);
+
+		glBindVertexArray(planeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// setup writing to the stencil buffer
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
+		glStencilMask(0xFF); // enable writing to the stencil buffer
+
+		// CUBE
+		noLightShader.use();
+
 		noLightShader.setMat4("projection", projection);
 		noLightShader.setMat4("view", view);
-
-		// render the CUBE
 		glm::mat4 cubeModel = glm::mat4(1.0f);
 		noLightShader.setMat4("model", cubeModel);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, containerTexture);
-		
+
 		glBindVertexArray(cubeVAO);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
-		// render the FLOOR
-		noTextureShader.use();
+		// draw outline
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+		glStencilMask(0x00); // disable writing to the stencil buffer
+		highlightShader.use();
+		
+		highlightShader.setMat4("projection", projection);
+		highlightShader.setMat4("view", view);
+		cubeModel = glm::scale(cubeModel, glm::vec3(1.05f));
+		highlightShader.setMat4("model", cubeModel);
 
-		noTextureShader.setMat4("projection", projection);
-		noTextureShader.setMat4("view", view);
-		glm::mat4 floorModel = glm::mat4(1.0f);
-		noTextureShader.setMat4("model", floorModel);
-		
-		glBindVertexArray(planeVAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		
-		glBindVertexArray(0);
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		// finish stencil testing
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glEnable(GL_DEPTH_TEST);		
 		
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
+		glBindVertexArray(0);
+		
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -235,7 +261,9 @@ int main() {
 	// ------------------------------------------------------------------
 	glDeleteBuffers(1, &cubeVBO);
 	glDeleteVertexArrays(1, &cubeVAO);
-
+	glDeleteBuffers(1, &planeVBO);
+	glDeleteVertexArrays(1, &planeVAO);
+	
 	glfwTerminate();
 	return 0;
 }
