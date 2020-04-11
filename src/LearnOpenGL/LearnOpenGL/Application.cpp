@@ -17,7 +17,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
 unsigned int loadTexture(char const * path);
-bool inversion = false;
 
 // screen
 const unsigned int SCR_WIDTH = 1920;
@@ -295,7 +294,6 @@ int main() {
 		// second pass
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		screenShader.use();
-		screenShader.setBool("inversion", inversion);
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -342,9 +340,6 @@ void processInput(GLFWwindow *window)
 		camera.ProcessKeyboard(UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 		camera.ProcessKeyboard(DOWN, deltaTime);
-
-	if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-		inversion = !glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
 	{
