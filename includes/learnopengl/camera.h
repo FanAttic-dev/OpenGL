@@ -120,6 +120,12 @@ public:
 			Fov = FOV_WIDE;
 	}
 
+	void LookBack()
+	{
+		Yaw += 180.0f;
+		updateCameraVectors();
+	}
+
 private:
 	// Calculates the front vector from the Camera's (updated) Euler Angles
 	void updateCameraVectors()

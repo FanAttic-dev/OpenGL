@@ -74,7 +74,6 @@ int main() {
 	// build and compile our shader program
 	// ------------------------------------
 	Shader noLightShader("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
-	Shader noTextureShader("Shaders/no_texture.vs", "Shaders/no_texture.fs");
 	Shader screenShader("Shaders/screen_quad.vs", "Shaders/screen_quad.fs");
 	
 	
@@ -84,12 +83,12 @@ int main() {
 	// Screen Quad
 	float quadVertices[] = {
 		// positions   // texCoords
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		-1.0f, -1.0f,  0.0f, 0.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
+		0.5f,  1.0f,  0.0f, 1.0f,
+		0.5f, 0.5f,  0.0f, 0.0f,
+		 1.0f, 0.5f,  1.0f, 0.0f,
 
-		-1.0f,  1.0f,  0.0f, 1.0f,
-		 1.0f, -1.0f,  1.0f, 0.0f,
+		0.5f,  1.0f,  0.0f, 1.0f,
+		 1.0f, 0.5f,  1.0f, 0.0f,
 		 1.0f,  1.0f,  1.0f, 1.0f
 	};
 	
@@ -261,6 +260,7 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection = glm::perspective(glm::radians(camera.Fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
+		camera.LookBack();
 		glm::mat4 view = camera.GetViewMatrix();		
 		
 		// FLOOR
@@ -293,9 +293,48 @@ int main() {
 
 		// second pass
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		camera.LookBack();
+		view = camera.GetViewMatrix();
+
+		// render normal scene
+		
+		// FLOOR
+		noLightShader.use();
+
+		noLightShader.setMat4("projection", projection);
+		noLightShader.setMat4("view", view);
+		floorModel = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.05f, 0));
+		noLightShader.setMat4("model", floorModel);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, marbleTexture);
+
+		glBindVertexArray(planeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		// CUBE		
+		noLightShader.use();
+
+		noLightShader.setMat4("projection", projection);
+		noLightShader.setMat4("view", view);
+		cubeModel = glm::mat4(1.0f);
+		noLightShader.setMat4("model", cubeModel);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, containerTexture);
+
+		glBindVertexArray(cubeVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		
+		// render the mirror
+		
 		screenShader.use();
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		//glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		//glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindVertexArray(screenVAO);
 		glDisable(GL_DEPTH_TEST);
