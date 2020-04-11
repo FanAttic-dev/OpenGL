@@ -24,9 +24,9 @@ void main()
 	);
 
 	float kernel[9] = float[](
-		-1, -1, -1,
-		-1, 9, -1,
-		-1, -1, -1
+		1, 1, 1,
+		1, -8, 1,
+		1, 1, 1
 	);
 
 	float kernel_sum = 1.0;
