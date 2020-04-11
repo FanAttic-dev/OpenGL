@@ -23,13 +23,13 @@ void main()
 		vec2(offset, -offset)
 	);
 
-	float kernel[KERNEL_SIZE] = float[](
-		1.0, 2.0, 1.0,
-		2.0, 4.0, 2.0,
-		1.0, 2.0, 1.0
+	float kernel[9] = float[](
+		-1, -1, -1,
+		-1, 9, -1,
+		-1, -1, -1
 	);
 
-	float kernel_sum = 16.0;
+	float kernel_sum = 1.0;
 
 	vec3 color = vec3(0.0);
 	for (int i = 0; i < KERNEL_SIZE; ++i)
