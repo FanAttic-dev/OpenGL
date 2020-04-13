@@ -23,6 +23,9 @@ void renderScene(Shader &shader);
 void init();
 void loop();
 
+// ----------------------------------------
+// CONFIG
+
 // screen
 GLFWwindow* window = NULL;
 const unsigned int SCR_WIDTH = 1920;
@@ -44,9 +47,12 @@ float yLast = SCR_HEIGHT / 2.0f;
 float deltaTime = 0.f;
 float lastFrame = 0.f;
 
+// ----------------------------------------
 // lighting
 glm::vec3 lightPos(1.f);
 
+// ----------------------------------------
+// textures
 unsigned int containerTexture, marbleTexture = 0;
 void loadTextures()
 {
@@ -55,6 +61,8 @@ void loadTextures()
 	marbleTexture = TextureFromFile("marble.png", texturesDirectory);
 }
 
+// ----------------------------------------
+// models
 unsigned int screenVAO, screenVBO = 0;
 void loadScreenQuad()
 {
@@ -253,91 +261,5 @@ int initWindow()
 		std::cout << "Failed to initialize GLAD" << std::endl;
 		return -1;
 	}
-
 	return 0;
-}
-
-int main()
-{
-	if (initWindow() != 0)
-		return -1;
-
-	init();
-
-	while (!glfwWindowShouldClose(window))
-	{
-		loop();
-
-		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-		// -------------------------------------------------------------------------------
-		glBindVertexArray(0);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	// glfw: terminate, clearing all previously allocated GLFW resources.
-	// ------------------------------------------------------------------
-	glDeleteBuffers(1, &cubeVBO);
-	glDeleteVertexArrays(1, &cubeVAO);
-	glDeleteBuffers(1, &planeVBO);
-	glDeleteVertexArrays(1, &planeVAO);
-
-	glfwTerminate();
-	return 0;
-}
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.ProcessKeyboard(FORWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.ProcessKeyboard(BACKWARD, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.ProcessKeyboard(LEFT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.ProcessKeyboard(RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		camera.ProcessKeyboard(UP, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		camera.ProcessKeyboard(DOWN, deltaTime);
-
-	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-	{
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-}
-
-void mouse_callback(GLFWwindow* window, const double xpos, const double ypos)
-{
-	if (firstMouse) {
-		xLast = float(xpos);
-		yLast = float(ypos);
-		firstMouse = false;
-	}
-
-	const float xOffset = float(xpos) - xLast;
-	const float yOffset = yLast - float(ypos); // reversed since y-coordinates go from bottom to top
-	xLast = float(xpos);
-	yLast = float(ypos);
-
-	camera.ProcessMouseMovement(xOffset, yOffset);
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	camera.ProcessMouseScroll(float(yoffset));
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
 }
