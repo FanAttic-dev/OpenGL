@@ -155,6 +155,7 @@
     <ClInclude Include="..\..\..\includes\learnopengl\mesh.h" />
     <ClInclude Include="..\..\..\includes\learnopengl\model.h" />
     <ClInclude Include="..\..\..\includes\learnopengl\shader.h" />
+    <ClInclude Include="Application.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
