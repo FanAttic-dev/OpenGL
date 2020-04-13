@@ -76,3 +76,20 @@
 
      
 
+### Variables
+
+- Vertex shader
+  - `gl_PointSize`
+    - particle systems
+  - `gl_VertexID`
+    - indices or the index of the drawn vertices
+- Fragment shader
+  - `gl_FragCoord`
+    - testing different lighting techniques
+  - `gl_FrontFacing`
+  - `gl_FragDepth`
+    - [0.0, 1.0]
+    - implicitly `gl_FragDepth = gl_FragCoord.z`
+    - disadvantage: disables *early depth testing*
+      - => use `layout (depth_<condition>) out float gl_FragDepth;`
+  - 
