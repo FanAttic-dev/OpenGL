@@ -10,7 +10,11 @@ void init()
 
 	noLightShader = std::make_unique<Shader>("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	noLightShader->use();
-	noLightShader->setInt("texture0", 0);
+	noLightShader->setInt("texture0", 0);	
+
+	cubemapShader = std::make_unique<Shader>("Shaders/cubemap.vs", "Shaders/cubemap.fs");
+	cubemapShader->use();
+	cubemapShader->setInt("cubemap", 0);
 
 	// UBO
 	glGenBuffers(1, &uboMatrices);
@@ -22,8 +26,13 @@ void init()
 
 void loop()
 {	
+	// ----------------------------------------
+	// render
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
-	glm::mat4 view = camera.GetViewMatrix();
+	glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 
 	// UBO
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
@@ -31,9 +40,13 @@ void loop()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	// render
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	drawCubemap(cubemapShader.get());
+
+	// UBO
+	view = camera.GetViewMatrix();
+	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 	drawFloor(noLightShader.get());
 	drawCube(noLightShader.get());
@@ -129,4 +142,48 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+}
+
+
+// loads a cubemap texture from 6 individual texture faces
+// order:
+// +X (right)
+// -X (left)
+// +Y (top)
+// -Y (bottom)
+// +Z (front) 
+// -Z (back)
+// -------------------------------------------------------
+unsigned int loadCubemapTexture(const std::vector<string>& faces, const string &directory)
+{
+	unsigned int textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height, nrChannels;
+	for (unsigned int i = 0; i < faces.size(); ++i)
+	{
+		string path = directory + faces[i];
+		unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+		}
+	}
+
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
 }

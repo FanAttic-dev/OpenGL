@@ -18,7 +18,8 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-unsigned int loadTexture(char const * path);
+//unsigned int loadTexture(char const * path);
+unsigned int loadCubemapTexture(const std::vector<string>& faces, const string &directory);
 void renderScene(Shader &shader);
 void init();
 void loop();
@@ -32,7 +33,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1440;
 
 // programs
-std::unique_ptr<Shader> noLightShader;
+std::unique_ptr<Shader> noLightShader, cubemapShader;
 
 // Uniform buffer objects
 unsigned int uboMatrices = 0;
@@ -51,14 +52,25 @@ float lastFrame = 0.f;
 // lighting
 glm::vec3 lightPos(1.f);
 
+
 // ----------------------------------------
 // textures
-unsigned int containerTexture, marbleTexture = 0;
+unsigned int containerTexture, marbleTexture, cubemapTexture = 0;
 void loadTextures()
 {
 	string texturesDirectory = "../../../resources/textures";
 	containerTexture = TextureFromFile("container.jpg", texturesDirectory);
 	marbleTexture = TextureFromFile("marble.png", texturesDirectory);
+
+	std::vector<string> cubemapFaces{
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
+		"bottom.jpg",
+		"front.jpg",
+		"back.jpg"
+	};
+	cubemapTexture = loadCubemapTexture(cubemapFaces, texturesDirectory + "/skybox/");
 }
 
 // ----------------------------------------
@@ -93,6 +105,83 @@ void loadScreenQuad()
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 
 	glBindVertexArray(0);
+}
+
+unsigned int cubemapVAO, cubemapVBO = 0;
+void loadCubemap()
+{
+	if (cubemapVAO != 0)
+		return;
+	
+	float cubemapVertices[] = {
+		// positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f, -1.0f,
+		 1.0f,  1.0f,  1.0f,
+		 1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f, -1.0f,
+		 1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		 1.0f, -1.0f,  1.0f
+	};
+
+	glGenBuffers(1, &cubemapVAO);
+	glGenBuffers(1, &cubemapVBO);
+	glBindVertexArray(cubemapVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, cubemapVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubemapVertices), cubemapVertices, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	glBindVertexArray(0);
+}
+
+void drawCubemap(Shader* shader)
+{
+	glDepthMask(GL_FALSE);
+
+	shader->use();	
+	glBindVertexArray(cubemapVAO);
+	
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glDepthMask(GL_TRUE);
 }
 
 unsigned int cubeVAO, cubeVBO = 0;
@@ -223,6 +312,7 @@ void drawFloor(Shader* shader)
 void loadModels()
 {
 	loadScreenQuad();
+	loadCubemap();
 	loadCube();
 	loadPlane();
 }
