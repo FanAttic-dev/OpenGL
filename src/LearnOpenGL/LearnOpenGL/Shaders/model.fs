@@ -16,7 +16,7 @@ uniform Material material;
 uniform samplerCube skybox;
 uniform vec3 eyePos;
 
-float ratio = 1.0 / 2.42;
+float ratio = 1.0 / 1.33;
 
 void main() 
 {
