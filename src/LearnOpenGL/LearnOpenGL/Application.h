@@ -75,6 +75,8 @@ void loadTextures()
 
 // ----------------------------------------
 // models
+std::unique_ptr<Model> nanosuit;
+
 unsigned int screenVAO, screenVBO = 0;
 void loadScreenQuad()
 {
@@ -379,6 +381,26 @@ void drawReflectiveCube(Shader* shader)
 	glBindVertexArray(0);
 }
 
+void drawReflectiveModel(Shader* shader, Model* model)
+{
+	shader->use();
+
+	shader->setVec3("eyePos", camera.Position);
+
+	glm::mat4 modelMat = glm::mat4(1.0f);
+	modelMat = glm::translate(modelMat, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	modelMat = glm::scale(modelMat, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	
+	shader->setMat4("model", modelMat);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+	model->Draw(*shader);
+	
+	glBindVertexArray(0);
+}
+
 void drawFloor(Shader* shader)
 {
 	shader->use();
@@ -402,6 +424,8 @@ void loadModels()
 	loadCube();
 	loadPlane();
 	loadReflectiveCube();
+
+	nanosuit = std::make_unique<Model>("../../../resources/models/nanosuit/nanosuit.obj");
 }
 
 // ----------------------------------------

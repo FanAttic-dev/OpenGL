@@ -7,12 +7,10 @@ void init()
 
 	loadModels();
 	loadTextures();
-
 	
 	noLightShader = std::make_unique<Shader>("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	noLightShader->use();
 	noLightShader->setInt("texture0", 0);
-	
 	
 	envMappingShader = std::make_unique<Shader>("Shaders/env_mapping.vs", "Shaders/env_mapping.fs");
 	envMappingShader->use();
@@ -49,7 +47,8 @@ void loop()
 
 	//drawFloor(noLightShader.get());
 	//drawCube(noLightShader.get(), containerTexture);
-	drawReflectiveCube(envMappingShader.get());
+	//drawReflectiveCube(envMappingShader.get());
+	drawReflectiveModel(envMappingShader.get(), nanosuit.get());
 
 	// ---- Cubemap
 	// UBO
