@@ -401,6 +401,7 @@ void loadModels()
 	loadCubemap();
 	loadCube();
 	loadPlane();
+	loadReflectiveCube();
 }
 
 // ----------------------------------------
