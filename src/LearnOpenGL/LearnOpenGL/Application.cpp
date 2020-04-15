@@ -7,17 +7,11 @@ void init()
 
 	loadModels();
 	loadTextures();
-	
-	noLightShader = std::make_unique<Shader>("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
-	noLightShader->use();
-	noLightShader->setInt("texture0", 0);
 
 	modelShader = std::make_unique<Shader>("Shaders/model.vs", "Shaders/model.fs");
+	modelShader->use();
+	modelShader->setInt("skybox", 8);
 	
-	envMappingShader = std::make_unique<Shader>("Shaders/env_mapping.vs", "Shaders/env_mapping.fs");
-	envMappingShader->use();
-	envMappingShader->setInt("skybox", 0);
-
 	cubemapShader = std::make_unique<Shader>("Shaders/cubemap.vs", "Shaders/cubemap.fs");
 	cubemapShader->use();
 	cubemapShader->setInt("cubemap", 0);
@@ -47,17 +41,16 @@ void loop()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	//drawFloor(noLightShader.get());
-	//drawCube(noLightShader.get(), containerTexture);
-	//drawReflectiveCube(envMappingShader.get());
-
-	//drawReflectiveModel(envMappingShader.get(), nanosuit.get());
 	modelShader->use();
 	glm::mat4 modelMat = glm::mat4(1.0f);
-	modelMat = glm::translate(modelMat, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
-	modelMat = glm::scale(modelMat, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+	modelMat = glm::translate(modelMat, glm::vec3(0.0f, -1.75f, 0.0f));
+	modelMat = glm::scale(modelMat, glm::vec3(0.2f, 0.2f, 0.2f));	
 
 	modelShader->setMat4("model", modelMat);
+	modelShader->setVec3("eyePos", camera.Position);
+
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 
 	nanosuit->Draw(*modelShader);
 
