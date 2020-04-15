@@ -11,6 +11,8 @@ void init()
 	noLightShader = std::make_unique<Shader>("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	noLightShader->use();
 	noLightShader->setInt("texture0", 0);
+
+	modelShader = std::make_unique<Shader>("Shaders/model.vs", "Shaders/model.fs");
 	
 	envMappingShader = std::make_unique<Shader>("Shaders/env_mapping.vs", "Shaders/env_mapping.fs");
 	envMappingShader->use();
@@ -48,7 +50,16 @@ void loop()
 	//drawFloor(noLightShader.get());
 	//drawCube(noLightShader.get(), containerTexture);
 	//drawReflectiveCube(envMappingShader.get());
-	drawReflectiveModel(envMappingShader.get(), nanosuit.get());
+
+	//drawReflectiveModel(envMappingShader.get(), nanosuit.get());
+	modelShader->use();
+	glm::mat4 modelMat = glm::mat4(1.0f);
+	modelMat = glm::translate(modelMat, glm::vec3(0.0f, -1.75f, 0.0f)); // translate it down so it's at the center of the scene
+	modelMat = glm::scale(modelMat, glm::vec3(0.2f, 0.2f, 0.2f));	// it's a bit too big for our scene, so scale it down
+
+	modelShader->setMat4("model", modelMat);
+
+	nanosuit->Draw(*modelShader);
 
 	// ---- Cubemap
 	// UBO

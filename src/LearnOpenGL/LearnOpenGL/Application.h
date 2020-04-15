@@ -33,7 +33,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1440;
 
 // programs
-std::unique_ptr<Shader> noLightShader, envMappingShader, cubemapShader;
+std::unique_ptr<Shader> noLightShader, envMappingShader, cubemapShader, modelShader;
 
 // Uniform buffer objects
 unsigned int uboMatrices = 0;
