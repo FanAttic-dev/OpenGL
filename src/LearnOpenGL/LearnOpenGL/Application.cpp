@@ -32,24 +32,26 @@ void loop()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 projection = glm::perspective(glm::radians(camera.Fov), SCR_WIDTH / float(SCR_HEIGHT), 0.1f, 100.f);
-	glm::mat4 view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
+	glm::mat4 view = camera.GetViewMatrix();
 
+	// ---- Scene
 	// UBO
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &projection);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	drawCubemap(cubemapShader.get());
+	drawFloor(noLightShader.get());
+	drawCube(noLightShader.get());
 
+	// ---- Cubemap
 	// UBO
-	view = camera.GetViewMatrix();
+	view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
 	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	drawFloor(noLightShader.get());
-	drawCube(noLightShader.get());
+	drawCubemap(cubemapShader.get());
 }
 
 int main()

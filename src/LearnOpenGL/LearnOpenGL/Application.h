@@ -172,6 +172,7 @@ void loadCubemap()
 void drawCubemap(Shader* shader)
 {
 	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_LEQUAL);
 
 	shader->use();	
 	glBindVertexArray(cubemapVAO);
@@ -182,6 +183,7 @@ void drawCubemap(Shader* shader)
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_LESS);
 }
 
 unsigned int cubeVAO, cubeVBO = 0;
