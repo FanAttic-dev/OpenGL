@@ -33,7 +33,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1440;
 
 // programs
-std::unique_ptr<Shader> noLightShader, cubemapShader;
+std::unique_ptr<Shader> noLightShader, envMappingShader, cubemapShader;
 
 // Uniform buffer objects
 unsigned int uboMatrices = 0;
@@ -164,6 +164,7 @@ void loadCubemap()
 	glBindBuffer(GL_ARRAY_BUFFER, cubemapVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cubemapVertices), cubemapVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
 	glBindVertexArray(0);
@@ -171,18 +172,15 @@ void loadCubemap()
 
 void drawCubemap(Shader* shader)
 {
-	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);
 
 	shader->use();	
 	glBindVertexArray(cubemapVAO);
-	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	glDepthMask(GL_TRUE);
+	glBindVertexArray(0);
+	
 	glDepthFunc(GL_LESS);
 }
 
@@ -191,7 +189,7 @@ void loadCube()
 {
 	if (cubeVAO != 0)
 		return;
-
+	
 	float cubeVertices[] = {
 		// back face
 		-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
@@ -242,7 +240,7 @@ void loadCube()
 	glBindVertexArray(cubeVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
@@ -250,6 +248,70 @@ void loadCube()
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+
+	glBindVertexArray(0);
+}
+
+unsigned int reflectiveCubeVAO, reflectiveCubeVBO = 0;
+void loadReflectiveCube()
+{
+	if (reflectiveCubeVAO != 0)
+		return;
+	
+	float cubeVertices[] = {
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+	};
+	glGenVertexArrays(1, &reflectiveCubeVAO);
+	glGenBuffers(1, &reflectiveCubeVBO);
+	glBindVertexArray(reflectiveCubeVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, reflectiveCubeVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), cubeVertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
 	glBindVertexArray(0);
 }
@@ -283,18 +345,38 @@ void loadPlane()
 	glBindVertexArray(0);
 }
 
-void drawCube(Shader* shader)
+void drawCube(Shader* shader, unsigned int texture)
 {
 	shader->use();
 
-	glm::mat4 cubeModel = glm::scale(glm::mat4(1.0f), glm::vec3(0.5, 0.5, 0.5));
+	glm::mat4 cubeModel = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
 	shader->setMat4("model", cubeModel);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, containerTexture);
+	glBindTexture(GL_TEXTURE_2D, texture);
 
 	glBindVertexArray(cubeVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindVertexArray(0);
+}
+
+void drawReflectiveCube(Shader* shader)
+{
+	shader->use();
+
+	shader->setVec3("eyePos", camera.Position);
+
+	glm::mat4 cubeModel = glm::mat4(1.0f);
+	shader->setMat4("model", cubeModel);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+	glBindVertexArray(reflectiveCubeVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindVertexArray(0);
 }
 
 void drawFloor(Shader* shader)
@@ -309,6 +391,8 @@ void drawFloor(Shader* shader)
 
 	glBindVertexArray(planeVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindVertexArray(0);
 }
 
 void loadModels()

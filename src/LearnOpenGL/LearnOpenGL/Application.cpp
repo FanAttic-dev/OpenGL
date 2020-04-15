@@ -8,9 +8,15 @@ void init()
 	loadModels();
 	loadTextures();
 
+	
 	noLightShader = std::make_unique<Shader>("Shaders/no_lighting.vs", "Shaders/no_lighting.fs");
 	noLightShader->use();
-	noLightShader->setInt("texture0", 0);	
+	noLightShader->setInt("texture0", 0);
+	
+	
+	envMappingShader = std::make_unique<Shader>("Shaders/env_mapping.vs", "Shaders/env_mapping.fs");
+	envMappingShader->use();
+	envMappingShader->setInt("skybox", 0);
 
 	cubemapShader = std::make_unique<Shader>("Shaders/cubemap.vs", "Shaders/cubemap.fs");
 	cubemapShader->use();
@@ -41,8 +47,9 @@ void loop()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	drawFloor(noLightShader.get());
-	drawCube(noLightShader.get());
+	//drawFloor(noLightShader.get());
+	//drawCube(noLightShader.get(), containerTexture);
+	drawReflectiveCube(envMappingShader.get());
 
 	// ---- Cubemap
 	// UBO
@@ -85,6 +92,10 @@ int main()
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &planeVBO);
 	glDeleteVertexArrays(1, &planeVAO);
+	glDeleteBuffers(1, &cubemapVBO);
+	glDeleteVertexArrays(1, &cubemapVAO);
+	glDeleteBuffers(1, &reflectiveCubeVBO);
+	glDeleteVertexArrays(1, &reflectiveCubeVAO);
 
 	glfwTerminate();
 	return 0;
