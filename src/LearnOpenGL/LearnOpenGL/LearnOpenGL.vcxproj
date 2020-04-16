@@ -139,6 +139,8 @@
     <None Include="Shaders\cubemap.vs" />
     <None Include="Shaders\env_mapping.fs" />
     <None Include="Shaders\env_mapping.vs" />
+    <None Include="Shaders\instancing.fs" />
+    <None Include="Shaders\instancing.vs" />
     <None Include="Shaders\lighting.fs" />
     <None Include="Shaders\no_texture.fs" />
     <None Include="Shaders\no_texture.vs" />

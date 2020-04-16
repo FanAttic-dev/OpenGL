@@ -8,13 +8,7 @@ void init()
 	loadModels();
 	loadTextures();
 
-	modelShader = std::make_unique<Shader>("Shaders/model.vs", "Shaders/model.fs");
-	modelShader->use();
-	modelShader->setInt("skybox", 8);
-	
-	cubemapShader = std::make_unique<Shader>("Shaders/cubemap.vs", "Shaders/cubemap.fs");
-	cubemapShader->use();
-	cubemapShader->setInt("cubemap", 0);
+	instancingShader = std::make_unique<Shader>("Shaders/instancing.vs", "Shaders/instancing.fs");
 
 	// UBO
 	glGenBuffers(1, &uboMatrices);
@@ -41,27 +35,18 @@ void loop()
 	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	modelShader->use();
-	glm::mat4 modelMat = glm::mat4(1.0f);
-	modelMat = glm::translate(modelMat, glm::vec3(0.0f, -1.75f, 0.0f));
-	modelMat = glm::scale(modelMat, glm::vec3(0.2f, 0.2f, 0.2f));	
+	instancingShader->use();
 
-	modelShader->setMat4("model", modelMat);
-	modelShader->setVec3("eyePos", camera.Position);
+	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(0.05f));
+	instancingShader->setMat4("model", model);
 
-	glActiveTexture(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, containerTexture);
 
-	nanosuit->Draw(*modelShader);
+	glBindVertexArray(screenVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	// ---- Cubemap
-	// UBO
-	view = glm::mat4(glm::mat3(camera.GetViewMatrix()));
-	glBindBuffer(GL_UNIFORM_BUFFER, uboMatrices);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-	drawCubemap(cubemapShader.get());
+	glBindVertexArray(0);
 }
 
 int main()

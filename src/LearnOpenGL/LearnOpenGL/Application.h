@@ -33,7 +33,7 @@ const unsigned int SCR_WIDTH = 1920;
 const unsigned int SCR_HEIGHT = 1440;
 
 // programs
-std::unique_ptr<Shader> noLightShader, envMappingShader, cubemapShader, modelShader;
+std::unique_ptr<Shader> screenQuadShader, instancingShader, noLightShader, cubemapShader, modelShader;
 
 // Uniform buffer objects
 unsigned int uboMatrices = 0;
@@ -70,7 +70,7 @@ void loadTextures()
 		"front.jpg",
 		"back.jpg"
 	};
-	cubemapTexture = loadCubemapTexture(cubemapFaces, texturesDirectory + "/skybox/");
+	//cubemapTexture = loadCubemapTexture(cubemapFaces, texturesDirectory + "/skybox/");
 }
 
 // ----------------------------------------
@@ -85,12 +85,12 @@ void loadScreenQuad()
 
 	float quadVertices[] = {
 		// positions   // texCoords
-		0.5f,  1.0f,  0.0f, 1.0f,
-		0.5f, 0.5f,  0.0f, 0.0f,
-		 1.0f, 0.5f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
 
-		0.5f,  1.0f,  0.0f, 1.0f,
-		 1.0f, 0.5f,  1.0f, 0.0f,
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		 1.0f, -1.0f,  1.0f, 0.0f,
 		 1.0f,  1.0f,  1.0f, 1.0f
 	};
 
@@ -400,12 +400,12 @@ void drawFloor(Shader* shader)
 void loadModels()
 {
 	loadScreenQuad();
-	loadCubemap();
-	loadCube();
-	loadPlane();
-	loadReflectiveCube();
+	//loadCubemap();
+	//loadCube();
+	//loadPlane();
+	//loadReflectiveCube();
 
-	nanosuit = std::make_unique<Model>("../../../resources/models/nanosuit/nanosuit.obj");
+	//nanosuit = std::make_unique<Model>("../../../resources/models/nanosuit/nanosuit.obj");
 }
 
 // ----------------------------------------

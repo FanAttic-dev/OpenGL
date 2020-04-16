@@ -74,6 +74,12 @@
     <None Include="Shaders\env_mapping.vs">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\instancing.fs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\instancing.vs">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\resources\textures\awesomeface.png">
