@@ -8,7 +8,32 @@ void init()
 	loadModels();
 	loadTextures();
 
+	// instancing
+	const int nrRows = 5;
+	const int nrCols = 5;
+
+	glm::vec2 offsets[nrRows * nrCols * 4];
+
+	unsigned int index = 0;
+
+	for (int y = -nrRows + 1; y < nrRows; ++y) {
+		for (int x = -nrCols + 1; x < nrCols; ++x)
+		{
+			glm::vec2 offset;
+			offset.x = float(x) / float(nrCols);
+			offset.y = float(y) / float(nrRows);
+			offsets[index++] = offset;
+
+			cout << "[" << offsets[index - 1].x << ", " << offsets[index - 1].y << "] ";
+		}
+		cout << "index = " << index << endl;
+	}
+	
 	instancingShader = std::make_unique<Shader>("Shaders/instancing.vs", "Shaders/instancing.fs");
+
+	instancingShader->use();
+	for (unsigned int i = 0; i < nrRows * nrCols * 4; ++i)
+		instancingShader->setVec2("offsets[" + to_string(i) + "]", offsets[i]);
 
 	// UBO
 	glGenBuffers(1, &uboMatrices);
@@ -38,13 +63,15 @@ void loop()
 	instancingShader->use();
 
 	glm::mat4 model = glm::scale(glm::mat4(1.0), glm::vec3(0.05f));
+	model = glm::rotate(model, float(glfwGetTime()), glm::vec3(0, 0, 1));
 	instancingShader->setMat4("model", model);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, containerTexture);
 
 	glBindVertexArray(screenVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	//glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 100);
 
 	glBindVertexArray(0);
 }

@@ -11,11 +11,15 @@ layout(std140, binding = 0) uniform Matrices
 };
 
 uniform mat4 model;
+uniform vec2 offsets[100];
 
 out vec2 TexCoords;
+out vec2 offset;
 
 void main()
 {
-	gl_Position = model * vec4(aPos.x, aPos.y, 0.0, 1.0);
+	offset = offsets[gl_InstanceID];
+	vec4 pos = model * vec4(aPos.xy, 0.0, 1.0);
+	gl_Position = vec4(pos.xy + offset, 0.0, 1.0);
 	TexCoords = aTexCoords;
 }
