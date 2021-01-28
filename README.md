@@ -1,13 +1,15 @@
-# TODO
+**My OpenGL learning journey.** Mostly from [LearnOpengl.com](https://learnopengl.com/)
 
-- [ ] go through advenced methods
+## TODO
+
+- [ ] go through advanced methods
 - [ ] look up advanced data
 - [ ] setup lighting for a model
 - [ ] go thorugh PV227
 
 
 
-# NOTES
+## NOTES
 
 ### Model loading
 
